@@ -11,8 +11,8 @@ function init() {
 
 	document.getElementById('btn-reset').addEventListener('click', reset);
 
-	document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', scrollTo));
 	buildWeekNav();
+	document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', scrollTo));
 
 	dueDateInput.value = localStorage.getItem(localStorageKey);
 	if (dueDateInput.value?.length) {
@@ -22,7 +22,7 @@ function init() {
 
 function buildWeekNav() {
 	const ul = document.getElementById('nav-weeks');
-	for (let weekNo = 1; weekNo < 42; weekNo++) {
+	for (let weekNo = 5; weekNo < 40; weekNo += 5) {
 		const li = document.createElement('li');
 		
 		const a = document.createElement('a');
