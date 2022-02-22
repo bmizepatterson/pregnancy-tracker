@@ -1,0 +1,129 @@
+:root {
+	--border: 1px solid black;
+	--font-family: 'ABeeZee', sans-serif;
+	--yellow-100: hsl(45deg 100% 90%);
+	--yellow-200: hsl(45deg 100% 50%);
+	--blue-100: hsl(242deg 100% 90%);
+	--blue-200: hsl(242deg 100% 50%);
+	--gray-100: hsl(0deg 0% 90%);
+	--gray-200: hsl(0deg 0% 50%);
+	--gray-300: hsl(0deg 0% 20%);
+}
+
+body {
+	margin: 2em;
+	padding: 0;
+	font-family: var(--font-family);
+}
+
+input {
+	font-family: var(--font-family);
+}
+
+table {
+	border-collapse: collapse;
+}
+
+th {
+	font-weight: normal;
+}
+
+th,
+td {
+	padding: 0.25em 1em;
+}
+
+main {
+	display: flex;
+	margin: 2em 0;
+}
+
+nav {
+	position: sticky;
+	top: 2em;
+}
+
+nav > ul {
+	margin: 2em;
+	padding: 0;
+}
+
+nav > ul > li {
+	list-style-type: none;
+	padding: 0.25em 0;
+}
+
+.nav-link {
+	cursor: pointer;
+	font-size: 85%;
+}
+
+.nav-link:hover {
+	text-decoration: underline;
+}
+
+.empty {
+	display: none;
+}
+
+.table-tracker th,
+.table-tracker td {
+	border: var(--border);
+}
+
+.table-tracker > thead {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	color: white;
+	background: var(--gray-300);
+}
+
+.table-tracker > tbody > tr {
+	position: relative;
+}
+
+.table-tracker > tbody > tr:hover:not(.row-today):not(.row-due-date) {
+	background-color: var(--gray-100);
+}
+
+.row-today {
+	background-color: var(--yellow-100);
+}
+
+.row-due-date {
+	background-color: var(--blue-100);
+}
+
+.row-shaded:not(.row-today):not(.row-due-date) {
+	background-color: var(--gray-100);
+}
+
+.table-tracker > tbody > tr:hover::after,
+.row-today::after,
+.row-due-date::after {
+	content: '';
+	position: absolute;
+	inset: -2px;
+	border-style: solid;
+	border-width: 4px;
+	z-index: 1;
+}
+.table-tracker > tbody > tr:hover:not(.row-today):not(.row-due-date)::after {
+	border-color: var(--gray-200);
+	z-index: 2;
+}
+.row-today::after {
+	border-color: var(--yellow-200);
+}
+.row-due-date::after {
+	border-color: var(--blue-200);
+}
+
+
+.col-week-no,
+.col-day-gest,
+.col-day-fert,
+.col-countdown {
+	text-align: center;
+}
