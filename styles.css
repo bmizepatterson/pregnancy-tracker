@@ -1,6 +1,6 @@
 :root {
 	--border: 1px solid black;
-	--font-family: 'ABeeZee', sans-serif;
+	--font-family: 'Noto Sans', sans-serif;
 	--yellow-100: hsl(45deg 100% 90%);
 	--yellow-200: hsl(45deg 100% 50%);
 	--blue-100: hsl(242deg 100% 90%);
