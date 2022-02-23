@@ -1,6 +1,7 @@
 :root {
 	--border: 1px solid black;
 	--font-family: 'Noto Sans', sans-serif;
+	--font-size: 16px;
 	--yellow-100: hsl(45deg 100% 90%);
 	--yellow-200: hsl(45deg 100% 50%);
 	--blue-100: hsl(242deg 100% 90%);
@@ -14,10 +15,12 @@ body {
 	margin: 2em;
 	padding: 0;
 	font-family: var(--font-family);
+	font-size: var(--font-size);
 }
 
 input {
 	font-family: var(--font-family);
+	font-size: var(--font-size);
 }
 
 table {
