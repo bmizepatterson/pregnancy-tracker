@@ -89,10 +89,12 @@ nav > ul > li {
 
 .row-today {
 	background-color: var(--yellow-100);
+	font-weight: bold;
 }
 
 .row-due-date {
 	background-color: var(--blue-100);
+	font-weight: bold;
 }
 
 .row-shaded:not(.row-today):not(.row-due-date) {
