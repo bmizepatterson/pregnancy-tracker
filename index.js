@@ -1,11 +1,12 @@
 const DateTime = luxon.DateTime;
-const localStorageKey = 'pregnancy-tracker-due-date';
+const localStorageKey = 'pregnancy-tracker';
 
 function init() {
 	const dueDateInput = document.getElementById('due-date-input');
 	document.getElementById('form-due-date')
 		.addEventListener('submit', (e) => {
-			update(dueDateInput.value);
+			saveDueDate(dueDateInput.value);
+			updateTable(dueDateInput.value);
 			e.preventDefault();
 		});
 
@@ -14,9 +15,9 @@ function init() {
 	buildWeekNav();
 	document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', scrollTo));
 
-	dueDateInput.value = localStorage.getItem(localStorageKey);
-	if (dueDateInput.value?.length) {
-		update(dueDateInput.value);
+	dueDateInput.value = getSavedData()?.dueDate ?? '';
+	if (dueDateInput.value.length) {
+		updateTable(dueDateInput.value);
 	}
 }
 
@@ -35,18 +36,43 @@ function buildWeekNav() {
 	}
 }
 
-function update(dueDateStr) {
-	localStorage.setItem(localStorageKey, dueDateStr);
+function getSavedData() {
+	return JSON.parse(localStorage.getItem(localStorageKey));
+}
 
-	if (!/\d{4}-\d{2}-\d{2}/.test(dueDateStr)) {
-		console.error('Invalid due date');
-		reset();
-		return;
+function saveDueDate(dueDate) {
+	if (!/\d{4}-\d{2}-\d{2}/.test(dueDate)) {
+		throw new Error('Invalid due date');
 	}
 
+	const data = {
+		...getSavedData(),
+		dueDate
+	};
+
+	localStorage.setItem(localStorageKey, JSON.stringify(data));
+}
+
+function saveNote(dayGest, note) {
+	if (dayGest == null) return;
+
+	const data = getSavedData();
+	if (data.notes == null) {
+		data.notes = [];
+	}
+	const existingNote = data.notes.find(note => note.dayGest === dayGest);
+	if (existingNote) {
+		existingNote.note = note;
+	} else {
+		data.notes.push({ dayGest, note });
+	}
+	localStorage.setItem(localStorageKey, JSON.stringify(data));
+}
+
+function updateTable(dueDateStr) {
 	const dueDate = DateTime.fromISO(dueDateStr);
 	const today = DateTime.now();
-	const data = calculateData(dueDate);
+	const data = calculateTableData(dueDate);
 	
 	// Build the table
 	const table = document.getElementById('table-tracker');
@@ -96,6 +122,12 @@ function update(dueDateStr) {
 		countdownCell.textContent = record.countdown;
 		countdownCell.classList.add('col-countdown');
 
+		const noteCell = document.createElement('td');
+		noteCell.innerHTML = record.note ?? '';
+		noteCell.classList.add('col-notes');
+		noteCell.setAttribute('contentEditable', 'true');
+		noteCell.addEventListener('blur', e => saveNote(record.dayGest, e.target.innerHTML));
+
 		row.appendChild(dateCell);
 		row.appendChild(weekNoCell);
 		row.appendChild(dayGestCell);
@@ -103,15 +135,18 @@ function update(dueDateStr) {
 		row.appendChild(agePregCell);
 		row.appendChild(ageConcCell);
 		row.appendChild(countdownCell);
+		row.appendChild(noteCell);
 		tbody.appendChild(row);
 	}
 
 	document.getElementById('main').classList.remove('empty');
 }
 
-function calculateData(dueDate) {
+function calculateTableData(dueDate) {
+	const savedData = getSavedData();
+
 	// Calculate 40 weeks of gestation + one additional week
-	const data = [];
+	const tableData = [];
 	for (let week = 0; week < 41; week++) {
 
 		for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
@@ -145,7 +180,17 @@ function calculateData(dueDate) {
 
 			const countdown = countdownDays < 1 ? null : countdownDays + (countdownDays === 1 ? ' day' : ' days');
 
-			data.push({
+			// Saved note
+			let note = (savedData?.notes ?? []).find(note => note.dayGest === dayGest)?.note;
+			if (!note) {
+				if (agePregWeeks === 13 && agePregDays === 0) {
+					note = '2nd Trimester Begins';
+				} else if (agePregWeeks === 28 && agePregDays === 0) {
+					note = '3rd Trimester Begins';
+				}
+			}
+
+			tableData.push({
 				date,
 				weekNo,
 				dayGest,
@@ -153,11 +198,12 @@ function calculateData(dueDate) {
 				agePreg,
 				ageConc,
 				countdown,
+				note,
 			});
 		}
 	}
 
-	return data;
+	return tableData;
 }
 
 function reset() {

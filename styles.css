@@ -120,10 +120,13 @@ nav > ul > li {
 	border-color: var(--blue-200);
 }
 
-
 .col-week-no,
 .col-day-gest,
 .col-day-fert,
 .col-countdown {
 	text-align: center;
+}
+
+.col-notes {
+	width: 20ch;
 }
