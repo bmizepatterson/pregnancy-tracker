@@ -270,6 +270,9 @@ function updateCalendar() {
 			if (dayData.date.toLocaleString() === today.toLocaleString()) {
 				calendarDay.classList.add('today');
 			}
+			if (dayData.note) {
+				calendarDay.classList.add('has-note');
+			}
 			calendarDays.appendChild(calendarDay);
 		}
 		monthContainer.appendChild(calendarDays);

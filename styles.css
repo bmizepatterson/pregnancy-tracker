@@ -137,8 +137,8 @@ td {
 }
 
 .calendar-wrapper {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
 	gap: 1em;
 	margin-top: 3rem;
 	margin-bottom: 3rem;
@@ -173,31 +173,57 @@ td {
 }
 
 .calendar-day {
+	--border-radius: 4px;
 	text-align: center;
 	border: 1px solid transparent;
-	border-radius: 4px;
+	border-radius: var(--border-radius);
 	padding: 0.1em 0.3em;
+	position: relative;
 }
 
-.calendar-day.pregnancy-day {
+.pregnancy-day {
 	border-color: var(--gray-50);
 	cursor: pointer;
 }
 
-.calendar-day.pregnancy-day:not(.due-date):not(.today):hover {
+.pregnancy-day:hover {
 	background-color: var(--gray-90);
 }
 
 .calendar-day.due-date {
 	background-color: var(--blue-90);
 	font-weight: bold;
-	border-width: 2px;
 	border-color: var(--blue-50);
 }
 
 .calendar-day.today {
 	background-color: var(--yellow-90);
 	font-weight: bold;
-	border-width: 2px;
+	border-color: var(--yellow-50);
+}
+
+.calendar-day.has-note {
+	background-color: var(--gray-90);
+}
+
+.calendar-day.due-date:hover::after,
+.calendar-day.today:hover::after,
+.calendar-day.has-note:hover::after {
+	content: '';
+	position: absolute;
+	inset: -3px;
+	border-style: solid;
+	border-width: 3px;
+	z-index: 1;
+	border-radius: var(--border-radius);
+}
+
+.calendar-day.has-note:hover::after {
+	border-color: var(--gray-50);
+}
+.calendar-day.due-date:hover::after {
+	border-color: var(--blue-50);
+}
+.calendar-day.today:hover::after {
 	border-color: var(--yellow-50);
 }
