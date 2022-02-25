@@ -5,6 +5,7 @@ const PREGNANCY_LENGTH_DAYS = 280;
 // State
 let dueDate;
 let tableData;
+let popup;
 
 function init() {
 	const dueDateInput = document.getElementById('due-date-input');
@@ -19,6 +20,7 @@ function init() {
 		});
 
 	document.getElementById('btn-reset').addEventListener('click', reset);
+	document.addEventListener('click', closeDayDetails);
 
 	buildWeekNav();
 
@@ -263,6 +265,8 @@ function updateCalendar() {
 			
 			if (dayData.dayGest != null) {
 				calendarDay.classList.add('pregnancy-day');
+				// calendarDay.setAttribute('data-calendar-day', dayData.dayGest);
+				calendarDay.addEventListener('click', e => openDayDetails(dayData, e));
 			}
 			if (dayData.date.toLocaleString() === dueDate.toLocaleString()) {
 				calendarDay.classList.add('due-date');
@@ -314,6 +318,45 @@ function groupByMonth(tableData) {
 	}
 
 	return data;
+}
+
+function openDayDetails(dayData, e) {
+	console.log(dayData);
+	closeDayDetails();
+	e.target.classList.add('active');
+	e.stopPropagation();
+
+	popup = document.createElement('div');
+	popup.classList.add('popup');
+	popup.addEventListener('click', e => e.stopPropagation());
+
+	const heading = document.createElement('h4');
+	heading.textContent = dayData.date.toLocaleString(DateTime.DATE_HUGE);
+	popup.appendChild(heading);
+
+	const lines = [
+		`<strong>${nth(dayData.weekNo)}</strong> Week`,
+		`<strong>${nth(dayData.dayGest)}</strong> Day of Gestation`,
+		`Pregnancy is <strong>${dayData.agePreg}</strong> old`,
+		`Conceptus is <strong>${dayData.ageConc}</strong> old`,
+		dayData.countdown == null ? null : `<strong>${dayData.countdown}</strong> until due date`,
+		dayData.note
+	];
+	lines.filter(line => line != null).forEach(line => {
+		const p = document.createElement('p');
+		p.innerHTML = line;
+		popup.appendChild(p);
+	});
+
+	const { top, left, width } = e.target.getBoundingClientRect();
+	popup.style.left = left + width + 4 + 'px';
+	popup.style.top = top + 'px';
+	document.body.appendChild(popup);
+}
+
+function closeDayDetails() {
+	document.querySelectorAll('.pregnancy-day').forEach(el => el.classList.remove('active'));
+	popup?.remove();
 }
 
 function reset() {
