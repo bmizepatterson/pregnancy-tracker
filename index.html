@@ -26,33 +26,39 @@
 
 	<main id="main" class="empty">
 
-		<table id="table-tracker" class="table-tracker">
-			<thead>
-				<tr>
-					<th class="col-date">Date</th>
-					<th class="col-week-no">Week No.</th>
-					<th class="col-day-gest">Day of Gestation</th>
-					<th class="col-day-fert">Day of Fertilization</th>
-					<th class="col-age-pregnancy">Age of Pregnancy</th>
-					<th class="col-age-conceptus">Age of Conceptus</th>
-					<th class="col-countdown">Countdown to Due Date</th>
-					<th class="col-notes">Notes</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
+		<section data-calendar class="calendar-wrapper"></section>
 
-		<div>
-			<nav>
-				<ul>
-					<li><a class="nav-link" data-nav="top">Top</a></li>
-					<li><a class="nav-link" data-nav="today">Today</a></li>
-					<li><a class="nav-link" data-nav="due-date">Due Date</a></li>
-				</ul>
-				
-				<ul id="nav-weeks"></ul>
-			</nav>
-		</div>
+		<section data-table class="table-wrapper">
+
+			<table id="table-tracker" class="table-tracker">
+				<thead>
+					<tr>
+						<th class="col-date">Date</th>
+						<th class="col-week-no">Week No.</th>
+						<th class="col-day-gest">Day of Gestation</th>
+						<th class="col-day-fert">Day of Fertilization</th>
+						<th class="col-age-pregnancy">Age of Pregnancy</th>
+						<th class="col-age-conceptus">Age of Conceptus</th>
+						<th class="col-countdown">Countdown to Due Date</th>
+						<th class="col-notes">Notes</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+
+			<div>
+				<nav>
+					<ul>
+						<li><a class="nav-link" data-nav="top">Top</a></li>
+						<li><a class="nav-link" data-nav="today">Today</a></li>
+						<li><a class="nav-link" data-nav="due-date">Due Date</a></li>
+					</ul>
+					
+					<ul id="nav-weeks"></ul>
+				</nav>
+			</div>
+
+		</section>
 	</main>
 </body>
 </html>

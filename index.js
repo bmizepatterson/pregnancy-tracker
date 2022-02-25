@@ -1,23 +1,33 @@
 const DateTime = luxon.DateTime;
 const localStorageKey = 'pregnancy-tracker';
+const PREGNANCY_LENGTH_DAYS = 280;
+
+// State
+let dueDate;
+let tableData;
 
 function init() {
 	const dueDateInput = document.getElementById('due-date-input');
 	document.getElementById('form-due-date')
-		.addEventListener('submit', (e) => {
+		.addEventListener('submit', e => {
 			saveDueDate(dueDateInput.value);
-			updateTable(dueDateInput.value);
+			dueDate = DateTime.fromISO(dueDateInput.value);
+			calculateTableData();
+			updateTable();
+			updateCalendar();
 			e.preventDefault();
 		});
 
 	document.getElementById('btn-reset').addEventListener('click', reset);
 
 	buildWeekNav();
-	document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', scrollTo));
 
 	dueDateInput.value = getSavedData()?.dueDate ?? '';
 	if (dueDateInput.value.length) {
-		updateTable(dueDateInput.value);
+		dueDate = DateTime.fromISO(dueDateInput.value);
+		calculateTableData();
+		updateTable();
+		updateCalendar();
 	}
 }
 
@@ -34,10 +44,15 @@ function buildWeekNav() {
 		li.appendChild(a);
 		ul.appendChild(li);
 	}
+
+	document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', scrollTo));
 }
 
 function getSavedData() {
-	return JSON.parse(localStorage.getItem(localStorageKey));
+	if (localStorage.getItem(localStorageKey)) {
+		return JSON.parse(localStorage.getItem(localStorageKey));
+	}
+	return {};
 }
 
 function saveDueDate(dueDate) {
@@ -69,17 +84,15 @@ function saveNote(dayGest, note) {
 	localStorage.setItem(localStorageKey, JSON.stringify(data));
 }
 
-function updateTable(dueDateStr) {
-	const dueDate = DateTime.fromISO(dueDateStr);
+function updateTable() {
 	const today = DateTime.now();
-	const data = calculateTableData(dueDate);
 	
 	// Build the table
 	const table = document.getElementById('table-tracker');
 	const tbody = table.getElementsByTagName('tbody')[0];
 	tbody.innerHTML = '';
 
-	for (const record of data) {
+	for (const record of tableData) {
 		const row = document.createElement('tr');
 		if (record.date.toLocaleString() === today.toLocaleString()) {
 			row.classList.add('row-today');
@@ -142,11 +155,11 @@ function updateTable(dueDateStr) {
 	document.getElementById('main').classList.remove('empty');
 }
 
-function calculateTableData(dueDate) {
+function calculateTableData() {
 	const savedData = getSavedData();
 
 	// Calculate 40 weeks of gestation + one additional week
-	const tableData = [];
+	tableData = [];
 	for (let week = 0; week < 41; week++) {
 
 		for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
@@ -155,7 +168,7 @@ function calculateTableData(dueDate) {
 			const dayGest = (week * 7) + dayOfWeek;
 
 			// Countdown to Due Date
-			const countdownDays = 280 - dayGest;
+			const countdownDays = PREGNANCY_LENGTH_DAYS - dayGest;
 
 			// Date
 			const date = dueDate.minus({ days: countdownDays });
@@ -202,8 +215,102 @@ function calculateTableData(dueDate) {
 			});
 		}
 	}
+}
 
-	return tableData;
+function updateCalendar() {
+	const today = DateTime.now();
+	const data = groupByMonth(tableData);
+	console.log(data);
+
+	const container = document.querySelector('[data-calendar]');
+	container.innerHTML = '';
+
+	for (const monthData of data) {
+		const monthContainer = document.createElement('div');
+		monthContainer.classList.add('month-container');
+
+		// Month header
+		const header = document.createElement('div');
+		header.classList.add('month-header');
+		header.textContent = monthData.month.toLocaleString({ month: 'long', year: 'numeric' });
+		monthContainer.appendChild(header);
+
+		// Month weekdays
+		const weekdays = document.createElement('div');
+		weekdays.classList.add('month-weekdays', 'grid-calendar');
+		for (const weekdayStr of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']) {
+			const weekday = document.createElement('div');
+			weekday.textContent = weekdayStr;
+			weekdays.appendChild(weekday);
+		}
+		monthContainer.appendChild(weekdays);
+
+		// Month calendar days
+		const calendarDays = document.createElement('div');
+		calendarDays.classList.add('month-days', 'grid-calendar');
+
+		// Add padding days if the month doesn't start on Sunday
+		for (let padding = 0; padding < monthData.days[0].date.weekday; padding++) {
+			const paddingDay = document.createElement('div');
+			calendarDays.appendChild(paddingDay);
+		}
+
+		// Actual days in the month
+		for (const dayData of monthData.days) {
+			const calendarDay = document.createElement('div');
+			calendarDay.textContent = dayData.date.day;
+			calendarDay.classList.add('calendar-day');
+			
+			if (dayData.dayGest != null) {
+				calendarDay.classList.add('pregnancy-day');
+			}
+			if (dayData.date.toLocaleString() === dueDate.toLocaleString()) {
+				calendarDay.classList.add('due-date');
+			}
+			if (dayData.date.toLocaleString() === today.toLocaleString()) {
+				calendarDay.classList.add('today');
+			}
+			calendarDays.appendChild(calendarDay);
+		}
+		monthContainer.appendChild(calendarDays);
+
+		container.appendChild(monthContainer);
+	}
+}
+
+function groupByMonth(tableData) {
+	const data = [];
+	
+	// Group into months
+	for (const month of Array.from(new Set(tableData.map(tableRow => tableRow.date.month)))) {
+		const days = tableData.filter(tableDatum => tableDatum.date.month === month);
+		const firstDate = days[0].date;
+		const lastDate = days[days.length - 1].date;
+
+		// Include each day in the month, even if start date or due date are in the middle.
+		if (firstDate.day !== 1) {
+			for (let d = firstDate.day - 1; d > 0; d--) {
+				days.unshift({
+					date: firstDate.set({ day: d })
+				});
+			}
+		}
+
+		if (lastDate.day !== lastDate.daysInMonth) {
+			for (let d = lastDate.day + 1; d <= lastDate.daysInMonth; d++) {
+				days.push({
+					date: lastDate.set({ day: d })
+				});
+			}
+		}
+
+		data.push({
+			month: firstDate,
+			days,
+		});
+	}
+
+	return data;
 }
 
 function reset() {

@@ -2,13 +2,13 @@
 	--border: 1px solid black;
 	--font-family: 'Noto Sans', sans-serif;
 	--font-size: 16px;
-	--yellow-100: hsl(45deg 100% 90%);
-	--yellow-200: hsl(45deg 100% 50%);
-	--blue-100: hsl(242deg 100% 90%);
-	--blue-200: hsl(242deg 100% 50%);
-	--gray-100: hsl(0deg 0% 90%);
-	--gray-200: hsl(0deg 0% 50%);
-	--gray-300: hsl(0deg 0% 20%);
+	--yellow-50: hsl(45deg 100% 50%);
+	--yellow-90: hsl(45deg 100% 90%);
+	--blue-50: hsl(242deg 100% 50%);
+	--blue-90: hsl(242deg 100% 90%);
+	--gray-20: hsl(0deg 0% 20%);
+	--gray-50: hsl(0deg 0% 50%);
+	--gray-90: hsl(0deg 0% 90%);
 }
 
 body {
@@ -36,22 +36,22 @@ td {
 	padding: 0.25em 1em;
 }
 
-main {
+.table-wrapper {
 	display: flex;
 	margin: 2em 0;
 }
 
-nav {
+.table-wrapper nav {
 	position: sticky;
 	top: 2em;
 }
 
-nav > ul {
+.table-wrapper nav > ul {
 	margin: 2em;
 	padding: 0;
 }
 
-nav > ul > li {
+.table-wrapper nav > ul > li {
 	list-style-type: none;
 	padding: 0.25em 0;
 }
@@ -79,7 +79,7 @@ nav > ul > li {
 	top: 0;
 	z-index: 10;
 	color: white;
-	background: var(--gray-300);
+	background: var(--gray-20);
 }
 
 .table-tracker > tbody > tr {
@@ -87,21 +87,21 @@ nav > ul > li {
 }
 
 .table-tracker > tbody > tr:hover:not(.row-today):not(.row-due-date) {
-	background-color: var(--gray-100);
+	background-color: var(--gray-90);
 }
 
 .row-today {
-	background-color: var(--yellow-100);
+	background-color: var(--yellow-90);
 	font-weight: bold;
 }
 
 .row-due-date {
-	background-color: var(--blue-100);
+	background-color: var(--blue-90);
 	font-weight: bold;
 }
 
 .row-shaded:not(.row-today):not(.row-due-date) {
-	background-color: var(--gray-100);
+	background-color: var(--gray-90);
 }
 
 .table-tracker > tbody > tr:hover::after,
@@ -115,14 +115,14 @@ nav > ul > li {
 	z-index: 1;
 }
 .table-tracker > tbody > tr:hover:not(.row-today):not(.row-due-date)::after {
-	border-color: var(--gray-200);
+	border-color: var(--gray-50);
 	z-index: 2;
 }
 .row-today::after {
-	border-color: var(--yellow-200);
+	border-color: var(--yellow-50);
 }
 .row-due-date::after {
-	border-color: var(--blue-200);
+	border-color: var(--blue-50);
 }
 
 .col-week-no,
@@ -134,4 +134,70 @@ nav > ul > li {
 
 .col-notes {
 	width: 20ch;
+}
+
+.calendar-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1em;
+	margin-top: 3rem;
+	margin-bottom: 3rem;
+	--cal-padding: 0.5em;
+}
+
+.month-container {
+	border: var(--border);
+	border-radius: 0.5em;
+}
+
+.grid-calendar {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0.5em;
+}
+
+.month-header {
+	font-weight: bold;
+	padding: var(--cal-padding) var(--cal-padding) 0 var(--cal-padding);
+}
+
+.month-weekdays {
+	text-align: center;
+	font-size: 80%;
+	color: var(--gray-50);
+	padding: 0 var(--cal-padding);
+}
+
+.month-days {
+	padding: var(--cal-padding);
+}
+
+.calendar-day {
+	text-align: center;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	padding: 0.1em 0.3em;
+}
+
+.calendar-day.pregnancy-day {
+	border-color: var(--gray-50);
+	cursor: pointer;
+}
+
+.calendar-day.pregnancy-day:not(.due-date):not(.today):hover {
+	background-color: var(--gray-90);
+}
+
+.calendar-day.due-date {
+	background-color: var(--blue-90);
+	font-weight: bold;
+	border-width: 2px;
+	border-color: var(--blue-50);
+}
+
+.calendar-day.today {
+	background-color: var(--yellow-90);
+	font-weight: bold;
+	border-width: 2px;
+	border-color: var(--yellow-50);
 }
