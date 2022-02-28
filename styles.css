@@ -190,13 +190,13 @@ td {
 	background-color: var(--gray-90);
 }
 
-.calendar-day.due-date {
+.calendar-day.pregnancy-day.due-date {
 	background-color: var(--blue-90);
 	font-weight: bold;
 	border-color: var(--blue-50);
 }
 
-.calendar-day.today {
+.calendar-day.pregnancy-day.today {
 	background-color: var(--yellow-90);
 	font-weight: bold;
 	border-color: var(--yellow-50);
