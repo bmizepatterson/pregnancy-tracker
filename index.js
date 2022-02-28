@@ -340,13 +340,24 @@ function openDayDetails(dayData, e) {
 		`Pregnancy is <strong>${dayData.agePreg}</strong> old`,
 		`Conceptus is <strong>${dayData.ageConc}</strong> old`,
 		dayData.countdown == null ? null : `<strong>${dayData.countdown}</strong> until due date`,
-		dayData.note
 	];
 	lines.filter(line => line != null).forEach(line => {
 		const p = document.createElement('p');
 		p.innerHTML = line;
 		popup.appendChild(p);
 	});
+
+	// Note
+	const note = document.createElement('div');
+	note.classList.add('note');
+	note.innerHTML = dayData.note ?? '';
+	note.setAttribute('contentEditable', 'true');
+	note.addEventListener('blur', e => {
+		saveNote(dayData.dayGest, e.target.innerHTML);
+		dayData.note = e.target.innerHTML;
+		note.innerHTML = dayData.note ?? '';
+	});
+	popup.appendChild(note);
 
 	const { top, left, width } = e.target.getBoundingClientRect();
 	popup.style.left = left + width + 4 + 'px';

@@ -248,3 +248,17 @@ td {
 .popup p {
 	margin: 0;
 }
+.popup .note {
+	margin-top: 1em;
+	padding: 0.5em;
+	border: var(--border);
+	border-radius: var(--border-radius);
+}
+.popup .note::before {
+	content: 'Note: ';
+	font-size: 80%;
+	font-weight: bold;
+}
+.popup .note:focus-visible {
+	background: white;
+}
