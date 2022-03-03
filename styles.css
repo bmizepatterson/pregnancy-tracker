@@ -37,6 +37,17 @@ td {
 	padding: 0.25em 1em;
 }
 
+.fade {
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 1000ms, visibility 1000ms;
+}
+
+.fade.show {
+	visibility: visible;
+	opacity: 1;
+}
+
 .table-wrapper {
 	display: flex;
 	margin: 2em 0;

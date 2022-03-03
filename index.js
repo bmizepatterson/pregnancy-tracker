@@ -31,6 +31,8 @@ function init() {
 		updateTable();
 		updateCalendar();
 	}
+
+	setTimeout(() => document.body.classList.add('show'));
 }
 
 function buildWeekNav() {
