@@ -20,3 +20,26 @@ function scrollTo(e) {
 		behavior: 'smooth',
 	});
 }
+
+function buildElement(el, options) {
+	const element = document.createElement(el);
+	if (options?.innerHTML != null) {
+		element.innerHTML = options.innerHTML;
+	}
+	if (options?.textContent != null) {
+		element.textContent = options.textContent;
+	}
+	if (options?.classes?.length > 0) {
+		element.classList.add(...options.classes);
+	}
+	if (options?.attributes?.length > 0) {
+		options.attributes.forEach(([key, value]) => element.setAttribute(key, value));
+	}
+	if (options?.listeners?.length > 0) {
+		options.listeners.forEach(({ trigger, action }) => element.addEventListener(trigger, action));
+	}
+	if (options?.children?.length > 0) {
+		options.children.forEach(child => element.appendChild(child));
+	}
+	return element;
+}

@@ -39,11 +39,14 @@ function buildWeekNav() {
 	const ul = document.getElementById('nav-weeks');
 	for (let weekNo = 5; weekNo < 40; weekNo += 5) {
 		const li = document.createElement('li');
-		
-		const a = document.createElement('a');
-		a.setAttribute('data-nav', 'week-' + weekNo);
-		a.classList.add('nav-link');
-		a.textContent = nth(weekNo) + ' Week';
+
+		const a = buildElement('a', {
+			textContent: nth(weekNo) + ' Week',
+			classes: ['nav-link'],
+			attributes: [
+				['data-nav', 'week-' + weekNo]
+			],
+		});
 
 		li.appendChild(a);
 		ul.appendChild(li);
@@ -97,7 +100,65 @@ function updateTable() {
 	tbody.innerHTML = '';
 
 	for (const record of tableData) {
-		const row = document.createElement('tr');
+		const row = buildElement('tr', {
+			classes: record.weekNo % 2 === 0 ? ['row-shaded'] : [],
+			children: [
+				// Date
+				buildElement('td', {
+					textContent: record.date.toLocaleString({ month: 'short', day: 'numeric', weekday: 'short' }),
+					classes: ['col-date'],
+				}),
+
+				// Week Number
+				buildElement('td', {
+					textContent: nth(record.weekNo),
+					classes: ['col-week-no'],
+				}),
+
+				// Day of Gestation
+				buildElement('td', {
+					textContent: record.dayGest,
+					classes: ['col-day-gest'],
+				}),
+
+				// Day of Fertilization
+				buildElement('td', {
+					textContent: record.dayFert,
+					classes: ['col-day-fert'],
+				}),
+
+				// Age of Pregnancy
+				buildElement('td', {
+					textContent: record.agePreg,
+					classes: ['col-age-pregnancy'],
+				}),
+
+				// Age of Conceptus
+				buildElement('td', {
+					textContent: record.ageConc,
+					classes: ['col-age-conceptus'],
+				}),
+
+				// Countdown
+				buildElement('td', {
+					textContent: record.countdown,
+					classes: ['col-countdown'],
+				}),
+
+				// Note
+				buildElement('td', {
+					innerHTML: record.note ?? '',
+					classes: ['col-notes'],
+					attributes: [
+						['contentEditable', 'true'],
+					],
+					listeners: [
+						{ trigger: 'blur', action: e => saveNote(record.dayGest, e.target.innerHTML) },
+					]
+				})
+			]
+		})
+
 		if (record.date.toLocaleString() === today.toLocaleString()) {
 			row.classList.add('row-today');
 			row.setAttribute('data-row-nav', 'today');
@@ -107,52 +168,7 @@ function updateTable() {
 		} else {
 			row.setAttribute('data-row-nav', 'week-' + record.weekNo);
 		}
-		if (record.weekNo % 2 === 0) {
-			row.classList.add('row-shaded');
-		}
 
-		const dateCell = document.createElement('td');
-		dateCell.textContent = record.date.toLocaleString({ month: 'short', day: 'numeric', weekday: 'short' });
-		dateCell.classList.add('col-date');
-
-		const weekNoCell = document.createElement('td');
-		weekNoCell.textContent = nth(record.weekNo);
-		weekNoCell.classList.add('col-week-no');
-
-		const dayGestCell = document.createElement('td');
-		dayGestCell.textContent = record.dayGest;
-		dayGestCell.classList.add('col-day-gest');
-
-		const dayFertCell = document.createElement('td');
-		dayFertCell.textContent = record.dayFert;
-		dayFertCell.classList.add('col-day-fert');
-
-		const agePregCell = document.createElement('td');
-		agePregCell.textContent = record.agePreg;
-		agePregCell.classList.add('col-age-pregnancy');
-
-		const ageConcCell = document.createElement('td');
-		ageConcCell.textContent = record.ageConc;
-		ageConcCell.classList.add('col-age-conceptus');
-
-		const countdownCell = document.createElement('td');
-		countdownCell.textContent = record.countdown;
-		countdownCell.classList.add('col-countdown');
-
-		const noteCell = document.createElement('td');
-		noteCell.innerHTML = record.note ?? '';
-		noteCell.classList.add('col-notes');
-		noteCell.setAttribute('contentEditable', 'true');
-		noteCell.addEventListener('blur', e => saveNote(record.dayGest, e.target.innerHTML));
-
-		row.appendChild(dateCell);
-		row.appendChild(weekNoCell);
-		row.appendChild(dayGestCell);
-		row.appendChild(dayFertCell);
-		row.appendChild(agePregCell);
-		row.appendChild(ageConcCell);
-		row.appendChild(countdownCell);
-		row.appendChild(noteCell);
 		tbody.appendChild(row);
 	}
 
@@ -230,58 +246,58 @@ function updateCalendar() {
 	container.innerHTML = '';
 
 	for (const monthData of data) {
-		const monthContainer = document.createElement('div');
-		monthContainer.classList.add('month-container');
+		const monthContainer = buildElement('div', {
+			classes: ['month-container'],
+			children: [
+				// Month header
+				buildElement('div', {
+					textContent: monthData.month.toLocaleString({ month: 'long', year: 'numeric' }),
+					classes: ['month-header'],
+				}),
 
-		// Month header
-		const header = document.createElement('div');
-		header.classList.add('month-header');
-		header.textContent = monthData.month.toLocaleString({ month: 'long', year: 'numeric' });
-		monthContainer.appendChild(header);
+				// Month weekdays
+				buildElement('div', {
+					classes: ['month-weekdays', 'grid-calendar'],
+					children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+						.map(textContent => buildElement('div', { textContent })),
+				}),
 
-		// Month weekdays
-		const weekdays = document.createElement('div');
-		weekdays.classList.add('month-weekdays', 'grid-calendar');
-		for (const weekdayStr of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']) {
-			const weekday = document.createElement('div');
-			weekday.textContent = weekdayStr;
-			weekdays.appendChild(weekday);
-		}
-		monthContainer.appendChild(weekdays);
+				// Month calendar days
+				buildElement('div', {
+					classes: ['month-days', 'grid-calendar'],
+					children: [
+						// Padding days
+						...Array(monthData.days[0].date.weekday).fill(null).map(() => buildElement('div')),
 
-		// Month calendar days
-		const calendarDays = document.createElement('div');
-		calendarDays.classList.add('month-days', 'grid-calendar');
+						// Actual days in the month
+						...monthData.days.map(dayData => {
+							const calendarDay = buildElement('div', {
+								textContent: dayData.date.day,
+								classes: ['calendar-day'],
+								listeners: dayData.dayGest != null ? [
+									{ trigger: 'click', action: e => openDayDetails(dayData, e) }
+								] : []
+							});
 
-		// Add padding days if the month doesn't start on Sunday
-		for (let padding = 0; padding < monthData.days[0].date.weekday; padding++) {
-			const paddingDay = document.createElement('div');
-			calendarDays.appendChild(paddingDay);
-		}
+							if (dayData.dayGest != null) {
+								calendarDay.classList.add('pregnancy-day');
+							}
+							if (dayData.date.toLocaleString() === dueDate.toLocaleString()) {
+								calendarDay.classList.add('due-date');
+							}
+							if (dayData.date.toLocaleString() === today.toLocaleString()) {
+								calendarDay.classList.add('today');
+							}
+							if (dayData.note) {
+								calendarDay.classList.add('has-note');
+							}
 
-		// Actual days in the month
-		for (const dayData of monthData.days) {
-			const calendarDay = document.createElement('div');
-			calendarDay.textContent = dayData.date.day;
-			calendarDay.classList.add('calendar-day');
-			
-			if (dayData.dayGest != null) {
-				calendarDay.classList.add('pregnancy-day');
-				// calendarDay.setAttribute('data-calendar-day', dayData.dayGest);
-				calendarDay.addEventListener('click', e => openDayDetails(dayData, e));
-			}
-			if (dayData.date.toLocaleString() === dueDate.toLocaleString()) {
-				calendarDay.classList.add('due-date');
-			}
-			if (dayData.date.toLocaleString() === today.toLocaleString()) {
-				calendarDay.classList.add('today');
-			}
-			if (dayData.note) {
-				calendarDay.classList.add('has-note');
-			}
-			calendarDays.appendChild(calendarDay);
-		}
-		monthContainer.appendChild(calendarDays);
+							return calendarDay;
+						})
+					]
+				}),
+			]
+		});
 
 		container.appendChild(monthContainer);
 	}
@@ -328,39 +344,47 @@ function openDayDetails(dayData, e) {
 	e.target.classList.add('active');
 	e.stopPropagation();
 
-	popup = document.createElement('div');
-	popup.classList.add('popup');
-	popup.addEventListener('click', e => e.stopPropagation());
+	popup = buildElement('div', {
+		classes: ['popup'],
+		listeners: [
+			{ trigger: 'click', action: e => e.stopPropagation() },
+		],
+		children: [
+			buildElement('h4', {
+				textContent: dayData.date.toLocaleString(DateTime.DATE_HUGE),
+			}),
 
-	const heading = document.createElement('h4');
-	heading.textContent = dayData.date.toLocaleString(DateTime.DATE_HUGE);
-	popup.appendChild(heading);
+			// Data paragraph lines
+			...[
+				`<strong>${nth(dayData.weekNo)}</strong> Week`,
+				`<strong>${nth(dayData.dayGest)}</strong> Day of Gestation`,
+				`Pregnancy is <strong>${dayData.agePreg}</strong> old`,
+				`Conceptus is <strong>${dayData.ageConc}</strong> old`,
+				dayData.countdown == null ? null : `<strong>${dayData.countdown}</strong> until due date`,
+			].filter(line => line != null).map(innerHTML => buildElement('p', { innerHTML })),
 
-	const lines = [
-		`<strong>${nth(dayData.weekNo)}</strong> Week`,
-		`<strong>${nth(dayData.dayGest)}</strong> Day of Gestation`,
-		`Pregnancy is <strong>${dayData.agePreg}</strong> old`,
-		`Conceptus is <strong>${dayData.ageConc}</strong> old`,
-		dayData.countdown == null ? null : `<strong>${dayData.countdown}</strong> until due date`,
-	];
-	lines.filter(line => line != null).forEach(line => {
-		const p = document.createElement('p');
-		p.innerHTML = line;
-		popup.appendChild(p);
+			// Note
+			buildElement('div', {
+				classes: ['note'],
+				innerHTML: dayData.note ?? '',
+				attributes: [
+					['contentEditable', 'true']
+				],
+				listeners: [
+					{ 
+						trigger: 'blur', 
+						action: e => {
+							saveNote(dayData.dayGest, e.target.innerHTML);
+							dayData.note = e.target.innerHTML;
+							note.innerHTML = dayData.note ?? '';
+						}
+					}
+				]
+			})
+		]
 	});
 
-	// Note
-	const note = document.createElement('div');
-	note.classList.add('note');
-	note.innerHTML = dayData.note ?? '';
-	note.setAttribute('contentEditable', 'true');
-	note.addEventListener('blur', e => {
-		saveNote(dayData.dayGest, e.target.innerHTML);
-		dayData.note = e.target.innerHTML;
-		note.innerHTML = dayData.note ?? '';
-	});
-	popup.appendChild(note);
-
+	// Position the popup
 	const { top, left, width } = e.target.getBoundingClientRect();
 	popup.style.left = left + width + 4 + 'px';
 	popup.style.top = top + 'px';
